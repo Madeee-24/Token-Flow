@@ -96,8 +96,8 @@ uvicorn main:app --reload
 📜 License
 
 This project is licensed under the MIT License.
+
 👨‍💻 Author
 
 Madesh S
 
-## 📂 Project Structure
