@@ -1,103 +1,85 @@
-# Token-Flow
-![License](https://img.shields.io/badge/license-MIT-blue)
-![React](https://img.shields.io/badge/frontend-React-blue)
-![FastAPI](https://img.shields.io/badge/backend-FastAPI-green)
-TokenGuard is a full-stack application that helps developers track, analyze, and optimize API usage across multiple LLM providers. It provides real-time insights into token consumption, usage percentage, remaining quota, and cost analytics, along with smart alerts to prevent overuse and unexpected billing.
-TokenGuard is a multi-LLM API usage monitoring platform designed to give developers complete visibility into their AI API consumption. The system integrates with providers like Grok, OpenAI, and Gemini to track token usage, calculate costs, and monitor limits in real time. It features an interactive dashboard with charts, usage alerts, and automated notifications when thresholds are exceeded. Built using React and FastAPI, the platform helps optimize API usage, reduce costs, and improve efficiency in AI-powered applications.
-# 🚀 TokenGuard – Multi-LLM API Usage Tracker
+# TokenFlow
 
-> Track. Analyze. Optimize your AI API usage.
+A clean, responsive dashboard for monitoring API usage across LLM providers
+(OpenAI, Claude, Gemini) — token consumption, cost, requests, and alerts.
 
-TokenGuard is a full-stack application that helps developers monitor API usage, token consumption, and costs across multiple LLM providers like Grok, OpenAI, and Gemini. It provides real-time analytics, alerts, and a visual dashboard to prevent overuse and unexpected billing.
+## Tech stack
 
----
+- React 19 + Vite
+- Tailwind CSS v4
+- Recharts for charts
+- Axios for API calls
+- React Router for navigation
+- lucide-react for icons
 
-## 📸 Demo Preview
-<!-- Add screenshots here -->
-![Dashboard Screenshot](./assets/dashboard.png)
-
----
-
-## 🔥 Features
-
-- 📊 Real-time API usage tracking
-- 🤖 Multi-LLM support (Grok, OpenAI, Gemini)
-- 💰 Cost monitoring & estimation
-- ⚠️ Smart alerts (80% warning, 95% critical)
-- 📈 Interactive charts (Bar, Pie, Line)
-- 🔄 Auto-refresh dashboard
-- 🔐 Secure API key handling (.env)
-- 🧠 Usage insights & analytics
-
----
-
-## 🧱 Tech Stack
-
-### 🖥️ Frontend
-- React (Vite)
-- Tailwind CSS
-- Recharts
-- Axios
-
-### ⚙️ Backend
-- FastAPI
-- Python
-- REST APIs
-
-### 🗄️ Optional (Future)
-- PostgreSQL / Firebase
-
----
-llm-usage-tracker/
-│
-├── backend/
-│ ├── main.py
-│ ├── routes/
-│ ├── services/
-│ └── requirements.txt
-│
-├── frontend/
-│ ├── src/
-│ ├── components/
-│ └── package.json
-│
-├── .gitignore
-├── LICENSE
-└── README.md
-
----
-
-## ⚙️ Installation & Setup
-
-### 🔽 1. Clone the Repository
+## Getting started
 
 ```bash
-git clone https://github.com/your-username/llm-usage-tracker.git
-cd llm-usage-tracker
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload
-{
-  "providers": [
-    {
-      "name": "Grok",
-      "tokens_used": 12000,
-      "limit": 20000,
-      "cost": 3.5
-    },
-    {
-      "name": "OpenAI",
-      "tokens_used": 8000,
-      "limit": 15000,
-      "cost": 2.1
-    }
-  ]
-}
-📜 License
+npm install
+npm run dev       # start the dev server
+npm run build     # production build to dist/
+npm run preview   # preview the production build locally
+```
 
-This project is licensed under the MIT License.
+## Demo mode vs. a real backend
 
-👨‍💻 Author
+The app ships in **demo mode**: `src/services/api.js` returns the bundled
+sample dataset (`src/data/mockData.js`) with a short simulated delay, so
+every page is fully explorable with no backend running.
 
-Madesh S
+To connect a real API, copy `.env.example` to `.env` and set:
 
+```
+VITE_API_BASE_URL=https://your-backend.com
+```
+
+Once set, `src/services/api.js` switches to real Axios calls against:
+
+| Method | Endpoint          | Used by                          |
+| ------ | ----------------- | --------------------------------- |
+| GET    | `/usage`           | Dashboard summary cards           |
+| GET    | `/usage/daily`     | Dashboard line chart              |
+| GET    | `/usage/models`    | Dashboard bar chart               |
+| GET    | `/usage/activity`  | Dashboard recent activity list    |
+| GET    | `/analytics`       | Analytics page (accepts `range`, `provider` query params) |
+| GET    | `/keys`            | API Keys page                     |
+| POST   | `/keys`            | Add API key form                  |
+| DELETE | `/keys/:id`        | Remove API key                    |
+
+Response shapes match the objects exported from `src/data/mockData.js`, so
+swapping in a real backend is a drop-in change.
+
+## Project structure
+
+```
+src/
+  components/       Reusable UI: Sidebar, Navbar, StatCard, ChartCard,
+                     DataTable, Modal, ThresholdToggle, ProviderBadge,
+                     States (loading/empty/error)
+  components/charts/ TokenLineChart, ModelBarChart, CostPieChart
+  pages/            Dashboard, ApiKeys, Analytics, Alerts
+  context/          ThemeContext (light/dark mode)
+  services/         api.js — Axios layer with demo-mode fallback
+  data/             mockData.js — sample dataset / API response shapes
+```
+
+## Design notes
+
+- Light theme, soft-gray canvas, white cards, rounded-2xl corners, soft
+  shadows — per the SaaS-dashboard brief.
+- A deep-ink sidebar gives the app a wayfinding anchor without breaking the
+  overall light theme.
+- The "flow" motif (an animated gradient line) marks the active nav item and
+  the quota bar, tying back to the product name. It respects
+  `prefers-reduced-motion`.
+- Provider colors (OpenAI green, Claude clay, Gemini blue) are used only as
+  small identifying accents (badges, chart series) so charts stay legible at
+  a glance.
+- Dark mode is a class-based toggle (`useTheme` in `ThemeContext`); all
+  colors are CSS variables so both themes stay in sync.
+
+## Responsive behavior
+
+- Sidebar collapses to an off-canvas drawer below `lg` breakpoint, toggled
+  from the navbar.
+- Summary cards, charts, and tables reflow to single-column on mobile.
